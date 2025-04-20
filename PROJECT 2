@@ -1,0 +1,149 @@
+#include <iostream>
+#include <vector>
+#include <string>
+
+using namespace std;
+
+class Course {
+public:
+    int id;
+    string name;
+
+    Course(int id, string name) : id(id), name(name) {}
+};
+
+class Student {
+public:
+    int id;
+    string name;
+    vector<Course> enrolledCourses;
+
+    Student(int id, string name) : id(id), name(name) {}
+
+    void enroll(Course course) {
+        enrolledCourses.push_back(course);
+        cout << name << " enrolled in " << course.name << endl;
+    }
+
+    void viewEnrolledCourses() {
+        cout << "Courses enrolled by " << name << ":\n";
+        for (auto &course : enrolledCourses) {
+            cout << "- " << course.name << endl;
+        }
+    }
+};
+
+vector<Course> courseList;
+vector<Student> studentList;
+
+// Function declarations
+void addCourse();
+void viewCourses();
+void addStudent();
+void studentMenu();
+
+int main() {
+    int choice;
+    while (true) {
+        cout << "\n===== Learning Management System =====\n";
+        cout << "1. Add Course\n";
+        cout << "2. View All Courses\n";
+        cout << "3. Add Student\n";
+        cout << "4. Student Portal\n";
+        cout << "5. Exit\n";
+        cout << "Enter choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1: addCourse(); break;
+            case 2: viewCourses(); break;
+            case 3: addStudent(); break;
+            case 4: studentMenu(); break;
+            case 5: exit(0);
+            default: cout << "Invalid choice!\n";
+        }
+    }
+}
+
+void addCourse() {
+    int id;
+    string name;
+    cout << "Enter Course ID: ";
+    cin >> id;
+    cout << "Enter Course Name: ";
+    cin.ignore();
+    getline(cin, name);
+    courseList.push_back(Course(id, name));
+    cout << "Course added successfully!\n";
+}
+
+void viewCourses() {
+    cout << "\n--- Available Courses ---\n";
+    for (auto &course : courseList) {
+        cout << "ID: " << course.id << " | Name: " << course.name << endl;
+    }
+}
+
+void addStudent() {
+    int id;
+    string name;
+    cout << "Enter Student ID: ";
+    cin >> id;
+    cout << "Enter Student Name: ";
+    cin.ignore();
+    getline(cin, name);
+    studentList.push_back(Student(id, name));
+    cout << "Student added successfully!\n";
+}
+
+void studentMenu() {
+    int id;
+    cout << "Enter Student ID to login: ";
+    cin >> id;
+
+    Student* student = nullptr;
+    for (auto &s : studentList) {
+        if (s.id == id) {
+            student = &s;
+            break;
+        }
+    }
+
+    if (!student) {
+        cout << "Student not found!\n";
+        return;
+    }
+
+    int choice;
+    while (true) {
+        cout << "\nWelcome, " << student->name << "\n";
+        cout << "1. View Available Courses\n";
+        cout << "2. Enroll in a Course\n";
+        cout << "3. View Enrolled Courses\n";
+        cout << "4. Logout\n";
+        cout << "Enter choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1: viewCourses(); break;
+            case 2: {
+                int courseId;
+                cout << "Enter Course ID to enroll: ";
+                cin >> courseId;
+                bool found = false;
+                for (auto &c : courseList) {
+                    if (c.id == courseId) {
+                        student->enroll(c);
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) cout << "Course not found!\n";
+                break;
+            }
+            case 3: student->viewEnrolledCourses(); break;
+            case 4: return;
+            default: cout << "Invalid choice!\n";
+        }
+    }
+}
