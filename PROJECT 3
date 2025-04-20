@@ -1,0 +1,26 @@
+#include <opencv2/opencv.hpp>
+#include <opencv2/dnn.hpp>
+#include <iostream>
+
+int main() {
+    cv::dnn::Net net = cv::dnn::readNetFromONNX("model.onnx");
+    cv::Mat image = cv::imread("test_image.jpg");
+
+    if (image.empty()) {
+        std::cerr << "Failed to load image!" << std::endl;
+        return -1;
+    }
+
+    cv::Mat blob = cv::dnn::blobFromImage(image, 1.0 / 255, cv::Size(224, 224));
+    net.setInput(blob);
+    cv::Mat output = net.forward();
+
+    cv::Point classIdPoint;
+    double confidence;
+    minMaxLoc(output, 0, &confidence, 0, &classIdPoint);
+
+    int predictedClass = classIdPoint.x;
+    std::cout << "Predicted class ID: " << predictedClass << " with confidence " << confidence << std::endl;
+
+    return 0;
+}
